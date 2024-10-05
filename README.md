@@ -2,5 +2,6 @@
 
 ## HOW TO INSTALL
 
-1.  install dependencies
+1.  Install dependencies
     `npm install`
+2.  Stil on progress
