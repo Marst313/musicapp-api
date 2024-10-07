@@ -1,7 +1,11 @@
 import express, { NextFunction, Request, Response } from 'express';
 import * as bodyParser from 'body-parser';
 import musicRouter from '../src/routes/musicRoutes';
+import authRouter from '../src/routes/authRoutes';
+
 import morgan from 'morgan';
+import { rateLimit } from 'express-rate-limit';
+import helmet from 'helmet';
 
 const app = express();
 
@@ -19,8 +23,22 @@ if (process.env.NODE_ENV === 'development') {
 
 // ! 2. Middleware
 
+// ? A. Set security headers
+app.use(helmet());
+
+// ? B. Set limiter
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    limit: 100,
+  })
+);
+
+// ? C. Security for cross site scripting
+
 // ! 3. ROUTES
 app.use('/api/v1/musics', musicRouter);
+app.use('/auth', authRouter);
 
 // ! 4. Error Routes
 app.all('*', function (req: Request, res: Response, next: NextFunction) {
