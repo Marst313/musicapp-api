@@ -1,6 +1,6 @@
 import { QueryError, ResultSetHeader } from 'mysql2';
-import { connection } from '../config/db';
-import { IMusicModel } from '../models/music';
+import { connection } from '../db';
+import { IMusicModel } from '../../models/musicModel';
 
 function selectAll(): Promise<IMusicModel[]> {
   const sqlQuery = `SELECT id, title, description, name, singer, file_name, image FROM musics;`;

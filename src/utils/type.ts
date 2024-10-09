@@ -1,5 +1,4 @@
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
-import { IMusicModel } from '../models/music';
 
 // ! ROUTING
 export type ErrorParams = {
@@ -7,3 +6,6 @@ export type ErrorParams = {
   statusCode: StatusCodes;
   message: string;
 };
+
+// ! JWT
+export type TOptions = { issuer: string; subject: string; audience: string };

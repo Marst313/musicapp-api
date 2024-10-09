@@ -1,4 +1,4 @@
-import { connection } from '../config/db';
+import { connection } from '../db';
 
 export async function initializeTables(): Promise<void> {
   const createNewTableQuery = [

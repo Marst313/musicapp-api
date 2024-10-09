@@ -1,6 +1,6 @@
 import app from './app';
 import dotenv from 'dotenv';
-import { initializeTables } from './services/dbInitService';
+import { initializeTables } from './database/seeders/seedingDb';
 
 dotenv.config();
 

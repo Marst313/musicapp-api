@@ -1,11 +1,12 @@
-import music from '../db/music';
 import { NextFunction, Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
-import { sendError } from './errorController';
-import { ReasonPhrases, StatusCodes } from 'http-status-codes';
-import { IMusicModel } from '../models/music';
+import { StatusCodes } from 'http-status-codes';
 
-async function getAllMusic(req: Request, res: Response) {
+import music from '../database/connection/musicConnection';
+import { IMusicModel } from '../models/musicModel';
+import { AppError } from '../utils/appError';
+
+async function getAllMusic(req: Request, res: Response, next: NextFunction) {
   try {
     const musics = await music.selectAll();
 
@@ -22,7 +23,7 @@ async function getAllMusic(req: Request, res: Response) {
   } catch (error) {
     console.error('Error type', error);
 
-    sendError({ message: 'Cannot get all music', status: ReasonPhrases.INTERNAL_SERVER_ERROR, statusCode: StatusCodes.INTERNAL_SERVER_ERROR }, res);
+    return next(new AppError('Cannot get all music', StatusCodes.INTERNAL_SERVER_ERROR));
   }
 }
 
@@ -31,7 +32,7 @@ async function createNewMusic(req: Request, res: Response, next: NextFunction) {
   const { description, file_name, image, name, singer, title } = newMusic;
 
   if (!description || !file_name || !image || !name || !singer || !title) {
-    return sendError({ message: 'Fields cant be empty', status: ReasonPhrases.BAD_REQUEST, statusCode: StatusCodes.BAD_REQUEST }, res);
+    return next(new AppError('Fields cant be empty', StatusCodes.BAD_REQUEST));
   }
 
   try {
@@ -47,11 +48,11 @@ async function createNewMusic(req: Request, res: Response, next: NextFunction) {
   } catch (error) {
     console.error('Error type', error);
 
-    sendError({ message: 'Cant create new music', status: ReasonPhrases.INTERNAL_SERVER_ERROR, statusCode: StatusCodes.INTERNAL_SERVER_ERROR }, res);
+    return next(new AppError('Cant create new music.', StatusCodes.INTERNAL_SERVER_ERROR));
   }
 }
 
-async function getSingleMusic(req: Request, res: Response) {
+async function getSingleMusic(req: Request, res: Response, next: NextFunction) {
   try {
     const musics = await music.getSingleMusic(req.params.id);
 
@@ -65,16 +66,16 @@ async function getSingleMusic(req: Request, res: Response) {
   } catch (error) {
     console.error('Error type', error);
 
-    return sendError({ message: 'Cant get single music', status: ReasonPhrases.INTERNAL_SERVER_ERROR, statusCode: StatusCodes.INTERNAL_SERVER_ERROR }, res);
+    return next(new AppError('Unable to get single music.', StatusCodes.INTERNAL_SERVER_ERROR));
   }
 }
 
-async function deleteSingleMusic(req: Request, res: Response) {
+async function deleteSingleMusic(req: Request, res: Response, next: NextFunction) {
   try {
     const deleted = await music.deleteSingleMusic(req.params.id);
 
     if (deleted) {
-      return sendError({ message: `Music with ${req.params.id} id's not found`, status: ReasonPhrases.NOT_FOUND, statusCode: StatusCodes.NOT_FOUND }, res);
+      return next(new AppError(`Music with ${req.params.id} id's not found.`, StatusCodes.NOT_FOUND));
     }
 
     res.status(204).json({
@@ -84,7 +85,7 @@ async function deleteSingleMusic(req: Request, res: Response) {
   } catch (error) {
     console.error('Error', error);
 
-    return sendError({ message: 'Cant delete single music', status: ReasonPhrases.INTERNAL_SERVER_ERROR, statusCode: StatusCodes.INTERNAL_SERVER_ERROR }, res);
+    return next(new AppError(`Unable to delete single music.`, StatusCodes.INTERNAL_SERVER_ERROR));
   }
 }
 

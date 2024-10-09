@@ -1,12 +1,12 @@
-import { Request, Response } from 'express';
-import { ReasonPhrases, StatusCodes } from 'http-status-codes';
+import { NextFunction, Request, Response } from 'express';
+import { StatusCodes } from 'http-status-codes';
 
-import { sendError } from './errorController';
-import { createNewUser } from '../db/user';
+import { userConnection } from '../database/connection/userConnection';
+import { AppError } from '../utils/appError';
 
-async function signUp(req: Request, res: Response) {
+async function signUp(req: Request, res: Response, next: NextFunction) {
   try {
-    const newUser = await createNewUser(req.body);
+    const newUser = await userConnection.createNewUser(req.body);
 
     res.status(StatusCodes.CREATED).json({
       status: 'success',
@@ -15,9 +15,22 @@ async function signUp(req: Request, res: Response) {
     });
   } catch (error) {
     console.log(error);
-
-    sendError({ message: 'Unable to complete sign-up', status: ReasonPhrases.INTERNAL_SERVER_ERROR, statusCode: StatusCodes.INTERNAL_SERVER_ERROR }, res);
+    return next(new AppError('Unable to complete Sign Up', StatusCodes.INTERNAL_SERVER_ERROR));
   }
 }
 
-export { signUp };
+async function signIn(req: Request, res: Response, next: NextFunction) {
+  try {
+    res.status(StatusCodes.OK).json({
+      status: 'success',
+      message: 'Success Sign In',
+      token: req.body.token,
+    });
+  } catch (error) {
+    console.log(error);
+
+    return next(new AppError('Unable to complate Sign In', StatusCodes.INTERNAL_SERVER_ERROR));
+  }
+}
+
+export { signUp, signIn };
